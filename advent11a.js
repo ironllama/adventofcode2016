@@ -1,8 +1,8 @@
 // EXAMPLE INPUT
-// F4 .  .  .  .  .  
-// F3 .  .  .  LG .  
-// F2 .  HG .  .  .  
-// F1 E  .  HM .  LM 
+// F4 .  .  .  .  .
+// F3 .  .  .  LG .
+// F2 .  HG .  .  .
+// F1 E  .  HM .  LM
 
 // PUZZLE INPUT
 // The first floor contains a strontium generator, a strontium-compatible microchip, a plutonium generator, and a plutonium-compatible microchip.
@@ -10,10 +10,118 @@
 // The third floor contains a thulium-compatible microchip.
 // The fourth floor contains nothing relevant.
 
-// F4 .  .  .  .  .  .  .  .  .  .  .  
+// F4 .  .  .  .  .  .  .  .  .  .  .
 // F3 .  .  .  .  .  .  .  .  .  .  TM
 // F2 .  .  .  .  .  TG RG RM CG CM .
 // F1 E  SG SM PG PM .  .  .  .  .  .
+
+
+const components = ['HG', 'HM', 'LG', 'LM'];
+let comp_floors = [2, 1, 3, 1];
+
+// const components = ['SG', 'SM', 'PG', 'PM', 'TG', 'TM', 'RG', 'RM', 'CG', 'CM'];
+// let comp_floors = [1, 1, 1, 1, 2, 3, 2, 2, 2, 2];
+
+const max_floor = 4;
+let shortest_possible = [];
+
+let final_floors = Array(comp_floors.length).fill(4);
+
+function is_possible(new_floors) {
+    for (let i = 0; i < new_floors.length - 1; i += 2) {  // For each chip
+        for (let j = 1; j < new_floors.length; j += 2) {
+            // console.log(`${new_floors[i]} === ${new_floors[j]} => ${new_floors[i] === new_floors[j]}`);
+            if (new_floors[i] === new_floors[i + 1] || new_floors[j] === new_floors[j - 1]) {
+                break;  // RTC already connected to chip, so stable.
+            }
+            if (new_floors[i] === new_floors[j]) {  // Other RTC's...
+                // console.log("MISMATCH: i:", i, "j:", j, new_floors[i], new_floors[j])
+                return false;  // Not same pair, and not already powered
+            }
+        }
+    }
+    return true;
+}
+// Tests
+// console.log(is_possible(comp_floors));    // true
+// console.log(is_possible([3, 2, 3, 2]));  // true
+// console.log(is_possible([3, 3, 2, 4]));  // true
+// console.log(is_possible([2, 2, 2, 2]));  // true
+// console.log(is_possible([1, 2, 2, 3]));  // false
+// console.log(is_possible([1, 2, 3, 1]));  // false
+
+let all_states = [];
+function move(curr_floor, in_floors, history) {
+    // console.log("move: in_floors:", in_floors);
+
+    let new_state = in_floors.join('');
+    if (all_states.includes(new_state)) {
+        return;
+    }
+    else {
+        all_states.push(new_state);
+    }
+
+    // if (shortest_possible.length > 0) return;
+
+    if (in_floors.every((v) => v === max_floor)) {
+        console.log("FINISHED!", history.length, history);
+        if (shortest_possible.length === 0 || history.length < shortest_possible.length) {
+            // shortest_possible.push(history);
+            shortest_possible = history;
+        }
+        return;
+    }
+
+    // Don't every try further if this path is longer than already found shortest path.
+    // if (shortest_possible.length > 0 && history.length > shortest_possible.length) {
+    //     return 0;
+    // }
+
+    for (let i = 0; i < in_floors.length; i++) {
+        if (in_floors[i] === curr_floor) {
+            if (in_floors[i] < max_floor) {
+                let new_one_up = in_floors.slice(0);
+                new_one_up[i] += 1;
+
+                for (let j = i + 1; j < in_floors.length; j++) {  // See if another component can also go?
+                    if (in_floors[j] === in_floors[i]) {  // Another component on the same floor?
+                        let new_two_up = new_one_up.slice(0);
+                        new_two_up[j] += 1;
+                        let new_two_history = new_two_up.join('');
+                        if (!history.includes(new_two_history) && is_possible(new_two_up)) move(curr_floor + 1, new_two_up, [...history, new_two_history]);
+                    }
+                }
+
+                let new_one_history = new_one_up.join('');
+                if (!history.includes(new_one_history) && is_possible(new_one_up)) move(curr_floor + 1, new_one_up, [...history, new_one_history]);
+            }
+            if (in_floors[i] > 1) {
+                let new_one_down = in_floors.slice(0);
+                new_one_down[i] -= 1;
+
+                for (let j = i + 1; j < in_floors.length; j++) {  // See if another component can also go?
+                    if (in_floors[j] === in_floors[i]) {  // Another component on the same floor?
+                        let new_two_down = new_one_down.slice(0);
+                        new_two_down[j] -= 1;
+                        let new_two_history = new_two_down.join('');
+                        if (!history.includes(new_two_history) && is_possible(new_two_down)) move(curr_floor - 1, new_two_down, [...history, new_two_history]);
+                    }
+                }
+
+                let new_one_history = new_one_down.join('');
+                if (!history.includes(new_one_history) && is_possible(new_one_down)) move(curr_floor - 1, new_one_down, [...history, new_one_history]);
+            }
+        }
+    }
+}
+move(1, comp_floors, [comp_floors.join('')]);
+console.log("FIN: ", shortest_possible.length, shortest_possible);
+
+// 319 - HIGH
+
+
+// OLD CODE
 
 let combos = [];
 
