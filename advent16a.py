@@ -11,7 +11,7 @@ while len(initial) < initLen:
     initial = initial + '0' + reverse
 
 initial = initial[:initLen]
-#print("INITIAL:", initial)
+# print("INITIAL:", initial)
 
 numPair = 2
 while len(initial) % 2 != 1:

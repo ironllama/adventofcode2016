@@ -247,29 +247,29 @@ result = ""
 
 def takeChip(thisRobot, newChip):
     global result, robots, behave, output
-    
-    #print (thisRobot + " GOT CHIP " + newChip)
+
+    # print (thisRobot, " GOT CHIP ", newChip)
     if thisRobot not in robots:
         robots[thisRobot] = [int(newChip)]
     else:
         if len(robots[thisRobot]) < 2:
             robots[thisRobot].append(int(newChip))
-            robots[thisRobot].sort();
+            robots[thisRobot].sort()
 
             if robots[thisRobot][0] == 17 and robots[thisRobot][1] == 61:
                 result = thisRobot
-                print (">>> FOUND: ", thisRobot)
+                # print (">>> FOUND: ", thisRobot)
 
             # Assuming that there are now TWO chips on this robot
             if thisRobot in behave:
-                print (thisRobot, " HAS TWO CHIPS:", robots[thisRobot][0], robots[thisRobot][1])
+                # print (thisRobot, " HAS TWO CHIPS:", robots[thisRobot][0], robots[thisRobot][1])
                 if behave[thisRobot]['low'][0] == 'output':
                     if behave[thisRobot]['low'][1] not in output:
                         output[behave[thisRobot]['low'][1]] = int(robots[thisRobot][0])
                     else:
                         output[behave[thisRobot]['low'][1]].append(int(robots[thisRobot][0]))
                     #print ("    CHIP", robots[thisRobot][0], "PUT IN OUTPUT")
-                    
+
                 elif behave[thisRobot]['low'][0] == 'bot':
                     #print ("    GIVING CHIP", robots[thisRobot][0], "TO", behave[thisRobot]['low'][1])
                     takeChip(behave[thisRobot]['low'][1], robots[thisRobot][0])
@@ -280,7 +280,7 @@ def takeChip(thisRobot, newChip):
                     else:
                         output[behave[thisRobot]['high'][1]].append(int(robots[thisRobot][1]))
                     #print ("    CHIP", robots[thisRobot][1], "PUT IN OUTPUT")
-                    
+
                 elif behave[thisRobot]['high'][0] == 'bot':
                     #print ("    GIVING CHIP", robots[thisRobot][1], "TO", behave[thisRobot]['high'][1])
                     takeChip(behave[thisRobot]['high'][1], robots[thisRobot][1])

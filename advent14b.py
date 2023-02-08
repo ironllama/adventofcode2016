@@ -23,7 +23,7 @@ while(True):
 
     for j in range(2016):
         hash = hashlib.md5(hash.encode('utf-8')).hexdigest()
-    
+
     threeMatch = re.search(r'([a-z0-9])\1\1', hash, re.I)
     if threeMatch:
         threeStr = threeMatch.group()
@@ -37,20 +37,19 @@ while(True):
             if len(threeKey) > 0:
                 for thisKey in threeKey:
                     final.append([ threeStr, thisKey, addCheck[thisKey][1], i, hash ])
-                    print(str(len(final)) + ':', threeStr, thisKey, addCheck[thisKey][1], i, hash)
+                    # print(str(len(final)) + ':', threeStr, thisKey, addCheck[thisKey][1], i, hash)
                     if len(final) == 64:
                         #print("END REACHED!")
                         break
                 if len(final) == 64: break
-                    
+
         addCheck[i] = [threeStr, hash]
     i += 1
 
 #print("ADDCHECK: ")
 #for k, v in addCheck.items(): print(k, v)
 
-print("FINAL:", final[len(final)-1])
+# print("FINAL:", final[len(final)-1])
 #for idx, v in enumerate(final):
 #    print(idx, v)
-
-    
+print("FINAL:", final[-1][1])

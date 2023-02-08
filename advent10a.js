@@ -1,11 +1,11 @@
-#allData = """value 5 goes to bot 2
-#bot 2 gives low to bot 1 and high to bot 0
-#value 3 goes to bot 1
-#bot 1 gives low to output 1 and high to bot 0
-#bot 0 gives low to output 2 and high to output 0
-#value 2 goes to bot 2"""
+// const allData = `value 5 goes to bot 2
+// bot 2 gives low to bot 1 and high to bot 0
+// value 3 goes to bot 1
+// bot 1 gives low to output 1 and high to bot 0
+// bot 0 gives low to output 2 and high to output 0
+// value 2 goes to bot 2`;
 
-allData = """bot 59 gives low to bot 176 and high to bot 120
+const allData = `bot 59 gives low to bot 176 and high to bot 120
 bot 92 gives low to bot 42 and high to bot 187
 value 31 goes to bot 114
 bot 182 gives low to bot 49 and high to bot 176
@@ -235,77 +235,74 @@ bot 130 gives low to bot 110 and high to bot 105
 value 5 goes to bot 92
 bot 35 gives low to output 3 and high to bot 50
 bot 152 gives low to output 8 and high to bot 190
-bot 143 gives low to bot 163 and high to bot 33"""
+bot 143 gives low to bot 163 and high to bot 33`;
 
-allDataList = allData.split('\n');
+const allDataList = allData.split('\n');
 
-robots = {}
-behave = {}
-output = {}
+let robots = {};
+let behave = {};
+let output = {};
 
-result = ""
+let result = ""
 
-def takeChip(thisRobot, newChip):
-    global result, robots, behave, output
+function takeChip(thisRobot, newChip) {
+    // console.log(thisRobot, " GOT CHIP ", newChip);
+    if (!(thisRobot in robots))
+        robots[thisRobot] = [parseInt(newChip)];
+    else {
+        if (robots[thisRobot].length < 2) {
+            robots[thisRobot].push(parseInt(newChip));
+            robots[thisRobot].sort((a, b) => a - b);
 
-    #print (thisRobot + " GOT CHIP " + newChip)
-    if thisRobot not in robots:
-        robots[thisRobot] = [int(newChip)]
-    else:
-        if len(robots[thisRobot]) < 2:
-            robots[thisRobot].append(int(newChip))
-            robots[thisRobot].sort()
+            if (robots[thisRobot][0] == 17 && robots[thisRobot][1] == 61) {
+                result = thisRobot;
+                // console.log(">>> FOUND:", thisRobot);
+            }
 
-            if robots[thisRobot][0] == 17 and robots[thisRobot][1] == 61:
-                result = thisRobot
-                # print (">>> FOUND: ", thisRobot)
+            //  Assuming that there are now TWO chips on this robot
+            if (thisRobot in behave) {
+                // console.log(thisRobot, "HAS TWO CHIPS:", robots[thisRobot][0], robots[thisRobot][1]);
+                if (behave[thisRobot]['low'][0] == 'output') {
+                    if (!(behave[thisRobot]['low'][1] in output))
+                        output[behave[thisRobot]['low'][1]] = parseInt(robots[thisRobot][0]);
+                    else
+                        output[behave[thisRobot]['low'][1]].push(parseInt(robots[thisRobot][0]));
+                    // console.log("    CHIP", robots[thisRobot][0], "PUT IN OUTPUT")
+                }
+                else if (behave[thisRobot]['low'][0] == 'bot')
+                    // console.log("    GIVING CHIP", robots[thisRobot][0], "TO", behave[thisRobot]['low'][1])
+                    takeChip(behave[thisRobot]['low'][1], robots[thisRobot][0]);
 
-            # Assuming that there are now TWO chips on this robot
-            if thisRobot in behave:
-                # print (thisRobot, " HAS TWO CHIPS:", robots[thisRobot][0], robots[thisRobot][1])
-                if behave[thisRobot]['low'][0] == 'output':
-                    if behave[thisRobot]['low'][1] not in output:
-                        output[behave[thisRobot]['low'][1]] = int(robots[thisRobot][0])
-                    else:
-                        output[behave[thisRobot]['low'][1]].append(int(robots[thisRobot][0]))
-                    #print ("    CHIP", robots[thisRobot][0], "PUT IN OUTPUT")
+                if (behave[thisRobot]['high'][0] == 'output') {
+                    if (!(behave[thisRobot]['high'][1] in output))
+                        output[behave[thisRobot]['high'][1]] = parseInt(robots[thisRobot][1]);
+                    else
+                        output[behave[thisRobot]['high'][1]].append(parseInt(robots[thisRobot][1]));
+                    // console.log("    CHIP", robots[thisRobot][1], "PUT IN OUTPUT")
+                }
+                else if (behave[thisRobot]['high'][0] == 'bot')
+                    // console.log("    GIVING CHIP", robots[thisRobot][1], "TO", behave[thisRobot]['high'][1])
+                    takeChip(behave[thisRobot]['high'][1], robots[thisRobot][1]);
+            }
+        }
+    }
+}
 
-                elif behave[thisRobot]['low'][0] == 'bot':
-                    #print ("    GIVING CHIP", robots[thisRobot][0], "TO", behave[thisRobot]['low'][1])
-                    takeChip(behave[thisRobot]['low'][1], robots[thisRobot][0])
-
-                if behave[thisRobot]['high'][0] == 'output':
-                    if behave[thisRobot]['high'][1] not in output:
-                        output[behave[thisRobot]['high'][1]] = int(robots[thisRobot][1])
-                    else:
-                        output[behave[thisRobot]['high'][1]].append(int(robots[thisRobot][1]))
-                    #print ("    CHIP", robots[thisRobot][1], "PUT IN OUTPUT")
-
-                elif behave[thisRobot]['high'][0] == 'bot':
-                    #print ("    GIVING CHIP", robots[thisRobot][1], "TO", behave[thisRobot]['high'][1])
-                    takeChip(behave[thisRobot]['high'][1], robots[thisRobot][1])
-
-for line in allDataList:
-    #print ("Processing ", line)
-    tokens = line.split()
-    if tokens[0] == 'bot':
-        if tokens[1] not in behave:
+allDataList.forEach(line => {
+    const tokens = line.split(" ");
+    if (tokens[0] === 'bot') {
+        if (!(tokens[1] in behave))
             behave[tokens[1]] = { 'low': [tokens[5], tokens[6]], 'high': [tokens[10], tokens[11]] }
-            #for k in sorted(behave): print(k, behave[k])
-        else:
-            print('PROBLEM: REPEAT BEHAVIOR!!!')
+        else
+            console.log('PROBLEM: REPEAT BEHAVIOR!!!')
+    }
+});
 
-for line in allDataList:
-    #print ("Processing ", line)
-    tokens = line.split()
-    if tokens[0] == 'value':
+allDataList.forEach(line => {
+    // console.log("Processing:", line);
+    const tokens = line.split(" ");
+    if (tokens[0] === 'value')
         takeChip(tokens[5], tokens[1])
+});
 
-# print("RESULT:", result)
-
-prod = 1
-for k, v in output.items():
-    if k == "0" or k == "1" or k == "2":
-        prod *= v
-
-print("PROD:", prod)
+console.log("RESULT:", result);

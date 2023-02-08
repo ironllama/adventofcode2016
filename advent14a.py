@@ -36,15 +36,12 @@ while(True):
                         #print("END REACHED!")
                         break
                 if len(final) == 64: break
-                    
+
         addCheck[i] = [threeStr, hash]
     i += 1
 
 #print("ADDCHECK: ")
 #for k, v in addCheck.items(): print(k, v)
 
-print("FINAL:")
-for idx, v in enumerate(final):
-    print(idx, v)
-
-    
+# for idx, v in enumerate(final): print(idx, v)
+print("FINAL:", final[-1][1])

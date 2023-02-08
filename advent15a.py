@@ -17,9 +17,9 @@ for i in range(len(allLines)):
     startPos = int(tokens[11][0:-1])
     startOffset = (numPos - (((i+1) + startPos) % numPos)) % numPos
     allArr.append([startOffset, numPos])
-    
-#print("ALLARR:", allArr)
-    
+
+# print("ALLARR:", allArr)
+
 def myGen():
     global allArr
     i = 0
@@ -29,12 +29,12 @@ def myGen():
 
 final = -1
 for i in myGen():
-    #print("TRYING:", i)
+    # print("TRYING:", i)
     for j in range(1, len(allArr)):
-        #print("TEST:", allArr[j][0])
+        # print("TEST:", allArr[j][0])
         if i % allArr[j][1] != allArr[j][0]: break
         elif j == (len(allArr) - 1):
-            #print("FOUND:", i)
+            # print("FOUND:", i)
             final = i
     if final != -1: break
 
